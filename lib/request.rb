@@ -78,7 +78,7 @@ module PaypalAdaptive
       call_api(data, "/AdaptivePayments/Refund")
     end
 
-    def call_api(data, path)
+    def call_api(data, path, additional_headers={})
       #hack fix: JSON.unparse doesn't work in Rails 2.3.5; only {}.to_json does..
       api_request_data = JSON.unparse(data) rescue data.to_json
       url = URI.parse @@api_base_url
@@ -87,6 +87,7 @@ module PaypalAdaptive
       http.verify_mode = OpenSSL::SSL::VERIFY_PEER
       http.ca_path = @@ssl_cert_path unless @@ssl_cert_path.nil?
       http.ca_file = @@ssl_cert_file unless @@ssl_cert_file.nil?
+      @@headers.merge!(additional_headers)
 
       resp, response_data = http.post(path, api_request_data, @@headers)
 
